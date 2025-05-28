@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRUD Simples - Usuários</title>
+    <style>
+        body {
+          font-family: Arial, sans-serif;
+          background-color: #f4f4f4;
+          margin: 20px;
+        }
+        h1 {
+          color: #333;
+        }
+        form {
+          margin-bottom: 20px;
+          background: #fff;
+          padding: 10px;
+          border: 1px solid #ddd;
+          max-width: 400px;
+        }
+        form input {
+          display: block;
+          width: 90%;
+          margin-bottom: 10px;
+          padding: 8px;
+          font-size: 1em;
+          border: 1px solid #ccc;
+        }
+        form button {
+          padding: 8px 12px;
+          font-size: 1em;
+        }
+        ul {
+          list-style: none;
+          padding: 0;
+        }
+        li {
+          background: #fff;
+          border: 1px solid #ddd;
+          padding: 10px;
+          margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+<h1>CRUD Simples - Usuários</h1>
+
+<form id="formUsuario">
+    <input type="text" id="nome" placeholder="Nome" required>
+    <input type="email" id="email" placeholder="Email" required>
+    <button type="submit">Adicionar Usuário</button>
+</form>
+
+<!-- Lista de usuários -->
+<ul id="listaUsuarios"></ul>
+
+<script>
+    // Função para carregar os usuários via GET
+    function carregarUsuarios() {
+      fetch("/usuarios")
+        .then(response => response.json())
+        .then(data => {
+          const lista = document.getElementById("listaUsuarios");
+          // Limpa a lista atual
+          lista.innerHTML = "";
+          // Adiciona cada usuário à lista
+          data.forEach(usuario => {
+            const li = document.createElement("li");
+            li.textContent = `${usuario.nome} - ${usuario.email}`;
+            lista.appendChild(li);
+          });
+        })
+        .catch(error => console.error("Erro ao buscar usuários:", error));
+    }
+
+    carregarUsuarios();
+
+    // Trata o envio do formulário para adicionar um novo usuário
+    document.getElementById("formUsuario").addEventListener("submit", function(event) {
+      event.preventDefault(); // Evita o comportamento padrão (recarregar a página)
+      // Obtém os valores dos inputs
+      const nome = document.getElementById("nome").value;
+      const email = document.getElementById("email").value;
+
+      // Cria o objeto usuário para envio
+      const usuario = { nome: nome, email: email };
+
+      // Envia os dados via POST para o endpoint /usuarios
+      fetch("/usuarios", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(usuario)
+      })
+      .then(response => response.json())
+      .then(data => {
+        alert("Usuário adicionado com sucesso!");
+        // Limpa o formulário
+        document.getElementById("formUsuario").reset();
+        // Recarrega a lista para incluir o novo usuário
+        carregarUsuarios();
+      })
+      .catch(error => {
+        console.error("Erro ao adicionar usuário:", error);
+      });
+    });
+</script>
+</body>
+</html>
